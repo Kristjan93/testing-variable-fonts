@@ -25,6 +25,9 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
 }
 
 html.lenis, html.lenis body {

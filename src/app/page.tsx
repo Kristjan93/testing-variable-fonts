@@ -1,72 +1,80 @@
-'use client'
+"use client";
 
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
-import { useLenis } from "./components/lenis"
-import { CSSProperties, useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useState } from "react";
+import "xp.css/dist/XP.css";
 
-export default function Page () {
-  const { scrollY } = useScroll()
-  const [isGoingDown, setIsGoingDown] = useState(true)
-
-  useMotionValueEvent(scrollY, 'change', (latest) => {
-    const previous = scrollY.getPrevious()
-    if (!previous) {
-      return
-    }
-    if (latest > previous && latest > 90) {
-      setIsGoingDown(true)
-    } else if (latest < previous) {
-      setIsGoingDown(false)
-    }
-  })
-
-
-  const [color, setColor] = useState('#000')
-  const x = useMotionValue(0)
-  const lenisRef = useLenis(lenis => {
-    x.set(lenis.progress)
-
-    if(lenis.progress > 0.45) {
-      setColor('#fff')
-    }
-    else {
-      setColor('#000')
-    }
-  })
-
-  // Uppercase Height
-  const YTFI = useTransform(x, [0, 1], [760, 528])
-  // Ascender Height
-  const YTAS = useTransform(x, [0, 1], [854, 649])
-
-  // Lowercase Height
-  const YTLC = useTransform(x, [0, 1], [570, 416])
-  // Descender Depth
-  const YTDE = useTransform(x, [0, 1], [-98, -305])
-
-  const YTUC = useTransform(x, [0, 1], [760, 538])
-
-  const fontVariationSettings = useMotionTemplate`"YTLC" ${YTLC}, "YTDE" ${YTDE}, "YTFI" ${YTFI}, "YTAS" ${YTAS}, "YTUC" ${YTUC}`
-
+export default function Page() {
+  const [maximized, setMaximized] = useState(false);
+  console.log(maximized);
+  const [closed, setClosed] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   return (
-    <motion.div className="flex text-black h-[400vw] relative bg-gradient-to-b from-white via-black/75 to-black"
-      animate={{ color }}
+    <div
+      className={cn(
+        "h-[100svh] w-[100vw] flex p-4 bg-[#ebe9d8]",
+        minimized && "items-end justify-start",
+        !minimized && "items-center justify-center"
+      )}
     >
-      <div className="flex w-full flex-1 items-center justify-center sticky top-0 h-screen">
-        <div className="font-roboto-flex text-center">
-          <div className="text-[10vw]">
-            Gummi
-            <motion.span
-            style={{fontVariationSettings}}>
-            {isGoingDown ? 'sig' : 'rís'}
-            </motion.span>
+      {!closed ? (
+        <div
+          className={cn(
+            "window",
+            maximized && "h-full w-full",
+            !maximized && "max-w-[800px] w-full",
+            minimized && "w-[350px]"
+          )}
+        >
+          <div className={
+            cn("title-bar p-4", 
+              minimized && "cursor-pointer",
+            )} onClick={() => {
+              minimized && setMinimized(false)
+              }}>
+            <div className="title-bar-text">Read the fucking prompt</div>
+            {!minimized && (
+              <div className="title-bar-controls">
+                <button
+                  onClick={() => setMinimized((state) => !state)}
+                  aria-label="Minimize"
+                ></button>
+                <button
+                  onClick={() => setMaximized((state) => !state)}
+                  aria-label="Maximize"
+                ></button>
+                <button
+                  onClick={() => setClosed(true)}
+                  aria-label="Close"
+                ></button>
+              </div>
+            )}
           </div>
-          <div className="text-[3vw]">
-            Scroll to the bottom and up
-          </div>
-          
+          {!minimized && (
+            <div className="window-body h-full">
+              <pre className="overflow-auto h-full">
+                Microsoft❮R❯ Windows DOS <br />${`❮C❯`} Copyright Microsoft Corp
+                1990-2001.
+                <br /> <br />${`C:\WINDOWS\SYSTEM32>`} Please take a look at
+                what i have been doing lately
+                <br />
+                <Link href="/olafurarnalds">olafurarnalds look a like</Link>
+                <br />
+                <Link href="/gummisig">variable font things</Link>
+                <br />
+                <br />${`C:\WINDOWS\SYSTEM32>`} I am currently working on a page
+                transitions
+                <br />${`C:\WINDOWS\SYSTEM32>`} I hope you enjoy your stay.
+              </pre>
+            </div>
+          )}
         </div>
-      </div>
-    </motion.div>
-  )
+      ) : (
+        <div className="text-[3vw] text-black max-w-[490px]">
+          Congratilation you closed the window ?
+        </div>
+      )}
+    </div>
+  );
 }
